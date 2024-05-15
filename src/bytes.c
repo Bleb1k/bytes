@@ -46,12 +46,12 @@ int main()
 		}
 		// Exit if unfocused
 		//----------------------------------------------------------------------------------
-		// if (!IsWindowFocused())
-		// 	break;
+		if (!IsWindowFocused())
+			break;
 
 		// Update
 		//----------------------------------------------------------------------------------
-		UpdateCamera(&camera, CAMERA_FIRST_PERSON);
+		UpdateCamera(&camera, CAMERA_FREE|CAMERA_FIRST_PERSON);
 		// Vector2 md = GetMouseDelta();
 		// Vector3 vel = {0, 0, 0};
 		// if (IsKeyDown(KEY_W))
@@ -107,9 +107,9 @@ int main()
 			}
 			EndShaderMode();
 
-			DrawText(TextFormat("Camera Pos: (x:%2.2f,y:%2.2f,z:%2.2f)", camera.position.x, camera.position.y, camera.position.z), 0, 0, 20, PURPLE);
-			DrawText(TextFormat("Camera Trg: (x:%2.2f,y:%2.2f,z:%2.2f)", camera.target.x, camera.target.y, camera.target.z), 0, 30, 20, PURPLE);
-			// DrawText(TextFormat("DMouse Pos: (x:%2.2f,y:%2.2f)", md.x, md.y), 0, 60, 20, PURPLE);
+			DrawText(TextFormat("Fps: (%d)", GetFPS()), 0, 0, 20, PURPLE);
+			DrawText(TextFormat("Camera Pos: (x:%2.2f,y:%2.2f,z:%2.2f)", camera.position.x, camera.position.y, camera.position.z), 0, 30, 20, PURPLE);
+			DrawText(TextFormat("Camera Trg: (x:%2.2f,y:%2.2f,z:%2.2f)", camera.target.x, camera.target.y, camera.target.z), 0, 60, 20, PURPLE);
 		}
 		EndDrawing();
 	}

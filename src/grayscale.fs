@@ -16,7 +16,7 @@ uniform int test[8];
 uniform vec2 res;
 uniform float runTime;
 uniform vec3 viewPos;
-uniform vec3 viewCenter;
+uniform vec3 viewTarget;
 
 
 // vec3 render( in vec3 ro, in vec3 rd )
@@ -74,34 +74,47 @@ uniform vec3 viewCenter;
 
 vec3 castRay(in vec3 ro, in vec3 rd) {
     // ew
-    ivec2 foo = ivec2(mod(fragTexCoord.x*16, 4), mod(fragTexCoord.y*8, 2));
+    ivec2 foo = ivec2(fragTexCoord.x*4., fragTexCoord.y*2.);
     int steps = test[foo.x + foo.y * 4];
     vec3 pos = ro;
 
-    // vec3 col = steps*vec3(0.7/8., 0.9/8., 1.0/8.);
-
-    // vec3 localPos = mod(pos, 1.);
-    // float closestEdge = min(min(localPos.x, localPos.y), localPos.z);
-    for(int i=0; i<30; i++) {
-    pos += rd;
-    }
+    vec3 col = vec3(0.7, 0.9, 1.0);
 
 
-    vec3 col = mod(pos, 30.)/30.;
-    if (ivec2(pos.xy) == ivec2(mod(pos.x*4, 4), mod(fragTexCoord.y*2,  
+    for (int i = 0; i < 100; i++){
+    vec3 dist_to = vec3(
+        mod(pos.x, 1) <= 0 ? 0.001 : ((rd.x <= 0 ? floor(pos.x):ceil(pos.x)) - pos.x),
+        mod(pos.y, 1) <= 0 ? 0.001 : ((rd.y <= 0 ? floor(pos.y):ceil(pos.y)) - pos.y),
+        mod(pos.z, 1) <= 0 ? 0.001 : ((rd.z <= 0 ? floor(pos.z):ceil(pos.z)) - pos.z)
+    );
+    vec3 sd = abs(dist_to / rd);
+
+    float mult = min(sd.x, min(sd.y, sd.z));
+    pos += rd * mult;
     
-     2))) {
-        col = vec3(0);
+    if (mod(i, 2) == 0) {
+    for (int step = 0; step < 8; step++) {
+        if (vec3(test[step], 1, 1) == floor(pos)+1) 
+            {col = vec3(0.7);
+        break;}
+        if (vec3(test[step], 1, 1) == ceil(pos)) 
+            {col = vec3(0.7);
+        break;}
+    }}
+    //     if (vec3(steps, 0, 0) == vec3(pos.x-1, floor(pos.yz))) 
+    //         {col = vec3(0);
+    //     break;}
+    // } else {
+    //     if (vec3(steps, 0, 0) == vec3(floor(pos.x), pos.y, floor(pos.z))) {col = vec3(1);break;}
+    //     if (vec3(steps, 0, 0) == vec3(floor(pos.x), pos.y, floor(pos.z))) {col = vec3(0);break;}
+    // }
+
+    // pos.x % 1 == 0
+    // ? { x: pos.x - 1, y: Math.floor(pos.y) }
+    // : { x: Math.floor(pos.x), y: pos.y - 1 };
+    
     }
-    if (pos.x < -0) {
-        col.x = 0;
-    }
-    if (pos.y < -0) {
-        col.y = 0;
-    }
-    if (pos.z < -0) {
-        col.z = 0;
-    }
+
 
     return col; // mod(rd, 1.); // vec3(0.7, 0.9, 1.0);
 }
@@ -120,7 +133,7 @@ void main()
     vec2 p = (-res.xy + 2.0*gl_FragCoord.xy)/res.y;
 
     vec3 ro = viewPos;
-    vec3 ta = viewCenter;
+    vec3 ta = viewTarget;
 
     // ca = camera-to-world transformation
     // setCamera( ro, ta, 0.0 ) returns a 3x3 matrix that transforms
